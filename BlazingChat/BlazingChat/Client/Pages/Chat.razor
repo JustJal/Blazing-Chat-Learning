@@ -1,7 +1,57 @@
-﻿@page "/chat/{firstname}"
-<h3>Chat</h3>
-<p>This is the chat: @firstName</p>
+﻿@page "/chat"
+@page "/chat/{ToUserId:int}"
+
+@using BlazingChat.Shared
+
+<div class="col-12">
+    <p></p>
+</div>
+
+<div style="border:0px;height:90vh;">
+    <div class="card" style="height: 100%;">
+        <div class="card-header top-bar">
+            <div class="col-md-8 col-xs-8">
+                <h3 class="card-title pt-2">
+                    @if (ToUser != null && (ToUser.FirstName != null || ToUser.LastName != null))
+                    {
+                        <b>@ToUser.FirstName<span>&nbsp;</span>@ToUser.LastName</b>
+                    }
+                </h3>
+            </div>
+        </div>
+
+        <div id="divMessageContainerBase" class="card-body msg_container_base" style="color:grey;">
+
+        </div>
+
+        <!--CHAT USER BOX-->
+        <div class="card-footer">
+            <div class="input-group" id="myForm">
+                <input id="txtMessageInput" type="text" class="form-control input-sm chat_input"
+                       placeholder="Write your message here...">
+            </div>
+        </div>
+    </div>
+
+</div>
+
 @code {
     [Parameter]
-    public string firstName { get; set; }
+    public int ToUserId { get; set; } = 1;
+    private List<Contact> ContactList { get; set; } = new List<Contact>();
+    public Contact ToUser { get; set; } = new Contact();
+
+    protected override void OnInitialized()
+    {
+        ContactList.AddRange(new[]
+        {
+                new Contact(1, "Julius", "Caesar"),
+                new Contact(2, "Marco", "Antonio"),
+                new Contact(3, "Leonel", "Messi"),
+                new Contact(4, "Cristiano", "Ronaldo"),
+                new Contact(5, "Antonie", "Griezzman")
+            });
+
+        ToUser = ContactList.Where(con => con.ID == ToUserId).FirstOrDefault();
+    }
 }
