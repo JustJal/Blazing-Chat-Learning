@@ -1,14 +1,14 @@
 ﻿@page "/contacts"
 @using BlazingChat.Shared
 @inject HttpClient Http
-
+@inject NavigationManager Manager
 <div class="col-12">
     @foreach (var contact in contacts)
-    {
-        <a class="list-group-item list-group-item-action flex-column align-items-start">
+     {
+        <a href="/chat/@contact.FirstName" class="list-group-item list-group-item-action flex-column align-items-start">
             @contact.FirstName <span>   </span> @contact.LastName
         </a>
-    }
+     }
 </div>
 
 @code {
@@ -18,6 +18,7 @@
     protected override async Task OnInitializedAsync()
     {
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+
         contacts.AddRange(new[]
         {
                 new Contact(1, "Julius", "Caesar"),
@@ -26,6 +27,11 @@
                 new Contact(4, "Cristiano", "Ronaldo"),
                 new Contact(5, "Antonie", "Griezzman")
             });
+    }
+
+    private void NavigateToChat(int ID)
+    {
+        Manager.NavigateTo($"/chat/{ID}");
     }
 
 }
