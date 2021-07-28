@@ -1,5 +1,8 @@
-﻿@page "/"
-@inject IProfileViewModel profileViewModel
+﻿@page "/profile"
+@inject IProfileViewModel profileViewModel 
+@inject NavigationManager navigationManager
+@using System.Security.Claims
+
 <h1>Profile</h1>
 <div class="col-8">
     <input type="text" class="form-control" @bind-value="profileViewModel.FirstName" placeholder="First Name" />
@@ -16,6 +19,24 @@
 
 @code{ 
 
-    protected override async Task OnInitializedAsync() => await profileViewModel.GetProfile();
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationState { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationState;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated) // user logged in
+        {
+            var claim = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+            profileViewModel.UserId = Convert.ToInt32(claim?.Value);
+            await profileViewModel.GetProfile();
+        }
+        else
+        {
+            navigationManager.NavigateTo("/");
+        }
+    }
+
 
 }

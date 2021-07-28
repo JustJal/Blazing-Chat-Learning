@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 
 namespace BlazingChat.Server.Controllers
 {
@@ -49,6 +51,46 @@ namespace BlazingChat.Server.Controllers
         [HttpGet("getprofile/{userid}")]
         public async Task<User> GetProfile(int userid) => await _context.Users.Where(user => user.UserId == userid)
                                                                               .FirstOrDefaultAsync();
+
+        [HttpPost("loginuser")]
+        public async Task<ActionResult<User>> LoginUser(User user)
+        {
+            User loggedInUser = await _context.Users.Where(u => u.EmailAddress.Equals(user.EmailAddress) && u.Password.Equals(user.Password)).FirstOrDefaultAsync();
+
+            if(loggedInUser != null)
+            {
+                //create claim
+                var claim = new Claim(ClaimTypes.Name, loggedInUser.EmailAddress);
+                //create identity claim
+                var claimsIdenity = new ClaimsIdentity(new[] { claim }, "ServerAuth");
+                //create principal claim
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdenity);
+                //Sign in
+                await HttpContext.SignInAsync(claimsPrincipal);
+            }
+
+            return await Task.FromResult(loggedInUser);
+        }
+
+        [HttpGet("getcurrentuser")]
+        public async Task<ActionResult<User>> GetCurrentUser()
+        {
+            User currentUser = new();
+            if (User.Identity.IsAuthenticated)
+            {
+                var emailAddress = User.FindFirstValue(ClaimTypes.Name);
+                currentUser = await _context.Users.Where(u => u.EmailAddress == emailAddress).FirstOrDefaultAsync();
+            }
+            return await Task.FromResult(currentUser);
+        }
+
+        [HttpGet("logoutuser")]
+        public async Task<ActionResult<string>> LogoutUser()
+        {
+            await HttpContext.SignOutAsync();
+            return "Success";
+
+        }
 
         [HttpGet("updatetheme")]
         public async Task<User> UpdateTheme(string userId, string value)

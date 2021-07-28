@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazingChat.Server", "BlazingChat\Server\BlazingChat.Server.csproj", "{AF954472-2646-4025-8A76-4C1276F739AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazingChat.Server", "BlazingChat\Server\BlazingChat.Server.csproj", "{AF954472-2646-4025-8A76-4C1276F739AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazingChat.Client", "BlazingChat\Client\BlazingChat.Client.csproj", "{CDECB0FE-615B-4AA6-A12B-59FE240FBCB3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazingChat.Client", "BlazingChat\Client\BlazingChat.Client.csproj", "{CDECB0FE-615B-4AA6-A12B-59FE240FBCB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazingChat.Shared", "BlazingChat\Shared\BlazingChat.Shared.csproj", "{C9DADED6-5FE6-41D6-841A-16A437158D16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazingChat.Shared", "BlazingChat\Shared\BlazingChat.Shared.csproj", "{C9DADED6-5FE6-41D6-841A-16A437158D16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
