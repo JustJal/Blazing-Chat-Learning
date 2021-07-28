@@ -6,8 +6,8 @@ namespace BlazingChat.Server.Models
     public partial class ChatHistory
     {
         public long ChatHistoryId { get; set; }
-        public long FromUserId { get; set; }
-        public long ToUserId { get; set; }
+        public int FromUserId { get; set; }
+        public int ToUserId { get; set; }
         public string Message { get; set; }
         public byte[] CreatedDate { get; set; }
 
