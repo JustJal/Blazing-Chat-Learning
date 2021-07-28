@@ -1,8 +1,6 @@
 ﻿@page "/chat"
 @page "/chat/{ToUserId:int}"
 
-@using BlazingChat.Shared
-
 <div class="col-12">
     <p></p>
 </div>
@@ -52,6 +50,6 @@
                 new Contact(5, "Antonie", "Griezzman")
             });
 
-        ToUser = ContactList.Where(con => con.ID == ToUserId).FirstOrDefault();
+        ToUser = ContactList.Where(con => con.ContactId == ToUserId).FirstOrDefault();
     }
 }

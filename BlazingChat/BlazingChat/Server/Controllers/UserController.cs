@@ -24,15 +24,12 @@ namespace BlazingChat.Server.Controllers
             _context = context;
         }
 
-        [HttpGet("getcontacts")]
-        public async Task<List<User>> GetContacts()
+        [HttpGet("getallcontacts")]
+        public List<User> GetContacts()
         {
-            return await _context.Users.ToListAsync();
+            return _context.Users.ToList();
         }
 
-        [HttpGet("getprofile/{userid}")]
-        public async Task<User> GetProfile(int userid) => await _context.Users.Where(user => user.UserId == userid)
-                                                                              .FirstOrDefaultAsync();
         [HttpPut("updateprofile/{userid}")]
         public async Task<User> UpdateProfile(int userid, [FromBody] User _user)
         {
@@ -48,6 +45,10 @@ namespace BlazingChat.Server.Controllers
 
             return await Task.FromResult(UserToUpdate);
         }
+
+        [HttpGet("getprofile/{userid}")]
+        public async Task<User> GetProfile(int userid) => await _context.Users.Where(user => user.UserId == userid)
+                                                                              .FirstOrDefaultAsync();
 
         [HttpGet("updatetheme")]
         public async Task<User> UpdateTheme(string userId, string value)
