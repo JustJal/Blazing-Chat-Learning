@@ -16,6 +16,7 @@ namespace BlazingChat.Client.ViewModels
         public string LastName { get; set; }
         public string Email { get; set; }
         public string message { get; set; }
+        public string ProfilePictureUrl { get; set; }
         public string AboutMe { get; set; }
 
         public static implicit operator ProfileViewModel(User user) 
@@ -25,7 +26,8 @@ namespace BlazingChat.Client.ViewModels
                 LastName = user.LastName,
                 Email = user.EmailAddress,
                 UserId = user.UserId,
-                AboutMe = user.AboutMe
+                AboutMe = user.AboutMe,
+                ProfilePictureUrl = user.ProfilePictureUrl
             };
         public static implicit operator User(ProfileViewModel profileViewModel)
             => new User
@@ -34,7 +36,8 @@ namespace BlazingChat.Client.ViewModels
                 LastName = profileViewModel.LastName,
                 EmailAddress = profileViewModel.Email,
                 UserId = profileViewModel.UserId,
-                AboutMe = profileViewModel.AboutMe
+                AboutMe = profileViewModel.AboutMe,
+                ProfilePictureUrl = profileViewModel.ProfilePictureUrl
             };
         public ProfileViewModel() { }
         public ProfileViewModel(HttpClient httpClient)
@@ -44,6 +47,7 @@ namespace BlazingChat.Client.ViewModels
         public async Task UpdateProfile()
         {
             User user = this;
+            Console.WriteLine(user.ProfilePictureUrl);
             await httpClient.PutAsJsonAsync("user/updateprofile/" + this.UserId, user);
             this.message = "Profile updated succesfully.";
         }
@@ -60,6 +64,7 @@ namespace BlazingChat.Client.ViewModels
             this.LastName = profileViewModel.LastName;
             this.Email = profileViewModel.Email;
             this.AboutMe = profileViewModel.AboutMe;
+            this.ProfilePictureUrl = profileViewModel.ProfilePictureUrl;
         }
     }
 }

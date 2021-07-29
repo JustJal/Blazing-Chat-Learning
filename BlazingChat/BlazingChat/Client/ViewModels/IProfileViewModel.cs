@@ -13,6 +13,7 @@ namespace BlazingChat.Client.ViewModels
         string Email { get; set; }
         string AboutMe { get; set; }
         string message { get; set; }
+        string ProfilePictureUrl { get; set; }
 
         Task UpdateProfile();
         Task GetProfile();

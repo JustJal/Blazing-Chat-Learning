@@ -42,10 +42,11 @@ namespace BlazingChat.Server.Controllers
             UserToUpdate.LastName = _user.LastName;
             UserToUpdate.EmailAddress = _user.EmailAddress;
             UserToUpdate.AboutMe = _user.AboutMe;
+            UserToUpdate.ProfilePictureUrl = _user.ProfilePictureUrl;
 
             await _context.SaveChangesAsync();
 
-            return await Task.FromResult(UserToUpdate);
+            return await Task.FromResult(_user);
         }
 
         [HttpGet("getprofile/{userid}")]
@@ -60,7 +61,7 @@ namespace BlazingChat.Server.Controllers
             if(loggedInUser != null)
             {
                 //create claim
-                var claim = new Claim(ClaimTypes.Name, loggedInUser.EmailAddress);
+                var claim = new Claim(ClaimTypes.Email, loggedInUser.EmailAddress);
                 //create identity claim
                 var claimsIdenity = new ClaimsIdentity(new[] { claim }, "ServerAuth");
                 //create principal claim
@@ -78,7 +79,7 @@ namespace BlazingChat.Server.Controllers
             User currentUser = new();
             if (User.Identity.IsAuthenticated)
             {
-                var emailAddress = User.FindFirstValue(ClaimTypes.Name);
+                var emailAddress = User.FindFirstValue(ClaimTypes.Email);
                 currentUser = await _context.Users.Where(u => u.EmailAddress == emailAddress).FirstOrDefaultAsync();
             }
             return await Task.FromResult(currentUser);

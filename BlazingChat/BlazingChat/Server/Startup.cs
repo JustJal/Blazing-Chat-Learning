@@ -28,7 +28,6 @@ namespace BlazingChat.Server
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddEntityFrameworkSqlite().AddDbContext<BlazingChatContext>();
-
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;

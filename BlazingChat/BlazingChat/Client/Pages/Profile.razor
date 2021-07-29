@@ -4,23 +4,43 @@
 @using System.Security.Claims
 
 <h1>Profile</h1>
-<div class="col-8">
-    <input type="text" class="form-control" @bind-value="profileViewModel.FirstName" placeholder="First Name" />
-    <br />
-    <input type="text" class="form-control" @bind-value="profileViewModel.LastName" placeholder="Last Name" />
-    <br />
-    <input type="text" class="form-control" @bind-value="profileViewModel.Email" placeholder="Email Address" />
-    <br />
-    <textarea class="form-control" @bind="profileViewModel.AboutMe" placeholder="About Me"></textarea>
-    <br />  
-    <button class="btn btn-primary" @onclick="profileViewModel.UpdateProfile">Update Profile</button>
-    <span>&nbsp;&nbsp;</span>@profileViewModel.message
-</div>
+<div class="col-12">
 
+    <div class="col-4">
+        <img src="@profileViewModel.ProfilePictureUrl" style="width: 250px; height: 250px;" /><br />  <br />
+        <InputFile OnChange="@OnInputFileChanged"></InputFile>
+    </div>
+    <hr />  
+    <div class="col-8">
+        <input type="text" class="form-control" @bind-value="profileViewModel.FirstName" placeholder="First Name" />
+        <br />
+        <input type="text" class="form-control" @bind-value="profileViewModel.LastName" placeholder="Last Name" />
+        <br />
+        <input type="text" class="form-control" @bind-value="profileViewModel.Email" placeholder="Email Address" />
+        <br />
+        <textarea class="form-control" @bind="profileViewModel.AboutMe" placeholder="About Me"></textarea>
+        <br />
+        <button class="btn btn-primary" @onclick="profileViewModel.UpdateProfile">Update Profile</button>
+        <span>&nbsp;&nbsp;</span>@profileViewModel.message
+    </div>
+</div>
 @code{ 
 
     [CascadingParameter]
     public Task<AuthenticationState> authenticationState { get; set; }
+
+    public async Task OnInputFileChanged(InputFileChangeEventArgs fileChangeEventArgs)
+    {
+        //Get the file
+        var file = fileChangeEventArgs.File;
+
+        //read the file
+        var buffer = new byte[file.Size];
+        await file.OpenReadStream(512000).ReadAsync(buffer);
+
+        //Parse to bytArray Base64String
+        profileViewModel.ProfilePictureUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+    }
     protected override async Task OnInitializedAsync()
     {
         var authState = await authenticationState;
