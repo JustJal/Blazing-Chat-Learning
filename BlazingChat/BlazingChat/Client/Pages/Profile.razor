@@ -1,30 +1,31 @@
 ﻿@page "/profile"
-@inject IProfileViewModel profileViewModel 
+@inject IProfileViewModel profileViewModel
 @inject NavigationManager navigationManager
 @using System.Security.Claims
 
 <h1>Profile</h1>
-<div class="col-12">
-
-    <div class="col-4">
-        <img src="@profileViewModel.ProfilePictureUrl" style="width: 250px; height: 250px;" /><br />  <br />
-        <InputFile OnChange="@OnInputFileChanged"></InputFile>
-    </div>
-    <hr />  
-    <div class="col-8">
-        <input type="text" class="form-control" @bind-value="profileViewModel.FirstName" placeholder="First Name" />
-        <br />
-        <input type="text" class="form-control" @bind-value="profileViewModel.LastName" placeholder="Last Name" />
-        <br />
-        <input type="text" class="form-control" @bind-value="profileViewModel.Email" placeholder="Email Address" />
-        <br />
-        <textarea class="form-control" @bind="profileViewModel.AboutMe" placeholder="About Me"></textarea>
-        <br />
-        <button class="btn btn-primary" @onclick="profileViewModel.UpdateProfile">Update Profile</button>
-        <span>&nbsp;&nbsp;</span>@profileViewModel.message
+<hr />
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <img src="@profileViewModel.ProfilePictureUrl" style="width: 250px; height: 250px;" /><br />  <br />
+            <InputFile OnChange="@OnInputFileChanged"></InputFile>
+        </div>
+        <div class="col-6">
+            <input type="text" class="form-control" @bind-value="profileViewModel.FirstName" placeholder="First Name" />
+            <br />
+            <input type="text" class="form-control" @bind-value="profileViewModel.LastName" placeholder="Last Name" />
+            <br />
+            <input type="text" class="form-control" @bind-value="profileViewModel.Email" placeholder="Email Address" />
+            <br />
+            <textarea class="form-control" @bind="profileViewModel.AboutMe" placeholder="About Me"></textarea>
+            <br />
+            <button class="btn btn-primary" @onclick="profileViewModel.UpdateProfile">Update Profile</button>
+            <span>&nbsp;&nbsp;</span>@profileViewModel.message
+        </div>
     </div>
 </div>
-@code{ 
+@code{
 
     [CascadingParameter]
     public Task<AuthenticationState> authenticationState { get; set; }
