@@ -3,7 +3,11 @@
 @inject HttpClient http 
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        <AuthorizeView>
+            <Authorized>
+                <NavMenu />
+            </Authorized>
+        </AuthorizeView>
     </div>
     <div class="main">
         <AuthorizeView>

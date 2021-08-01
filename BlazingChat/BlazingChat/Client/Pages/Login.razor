@@ -13,7 +13,20 @@
     <button class="btn btn-primary" @onclick="LoginUser">Login</button>   
 </div>
 
-@code {
+@code { 
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationState;
+        var user = authState.User;
+
+        if(user.Identity.IsAuthenticated)
+            navigator.NavigateTo("/profile", true);
+
+    }
+
     public async Task LoginUser()
     {
         await loginViewModel.LoginUser();
