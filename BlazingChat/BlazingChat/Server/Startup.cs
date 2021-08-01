@@ -30,7 +30,7 @@ namespace BlazingChat.Server
             services.AddRazorPages();
             services.AddSignalR();
             services.AddEntityFrameworkSqlite().AddDbContext<BlazingChatContext>();
-            
+
             services.AddResponseCompression(opts =>
             {
                 opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
@@ -40,7 +40,7 @@ namespace BlazingChat.Server
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie();
+            }).AddCookie(options => { options.LoginPath = "/user/notauthorized"; });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,6 +66,7 @@ namespace BlazingChat.Server
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
