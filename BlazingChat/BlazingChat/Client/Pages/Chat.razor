@@ -1,55 +1,113 @@
 ﻿@page "/chat"
-@page "/chat/{ToUserId:int}"
-
-<div class="col-12">
-    <p></p>
-</div>
+@page "/chat/{ToUserId}"
+@using BlazingChat.Shared.Models
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@inject HttpClient _httpClient
 
 <div style="border:0px;height:90vh;">
-    <div class="card" style="height: 100%;">
-        <div class="card-header top-bar">
+    <div class="panel panel-primary" style="height: 100%;">
+        <div class="panel-heading top-bar">
             <div class="col-md-8 col-xs-8">
-                <h3 class="card-title pt-2">
-                    @if (ToUser != null && (ToUser.FirstName != null || ToUser.LastName != null))
+                <h3 class="panel-title">
+                    @if (ToUser != null)
                     {
-                        <b>@ToUser.FirstName<span>&nbsp;</span>@ToUser.LastName</b>
+                        @if (ToUser.FirstName != null || ToUser.LastName != null)
+                        {
+                            <b>@ToUser.FirstName<span>&nbsp;</span>@ToUser.LastName</b>
+                        }
+                        else
+                        {
+                            <b>@ToUser.EmailAddress</b>
+                        }
                     }
                 </h3>
             </div>
         </div>
-
-        <div id="divMessageContainerBase" class="card-body msg_container_base" style="color:grey;">
-
+        <div id="divMessageContainerBase" class="panel-body msg_container_base">
+            @if (Messages != null && Messages.Count() > 0)
+            {
+                @foreach (var message in Messages)
+                {
+                    @if (message.FromUserId == FromUserId)
+                    {
+                        <div class="row msg_container base_sent">
+                            <div class="col-md-10 col-xs-10">
+                                <div class="messages msg_sent">
+                                    <p>@message.MessageText</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row msg_container base_receive">
+                            <div class="col-md-10 col-xs-10">
+                                <div class="messages msg_receive">
+                                    <p>@message.MessageText</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            }
         </div>
-
         <!--CHAT USER BOX-->
-        <div class="card-footer">
+        <div class="panel-footer">
             <div class="input-group" id="myForm">
-                <input id="txtMessageInput" type="text" class="form-control input-sm chat_input"
+                <input id="txtMessageInput" @bind="MessageText" type="text" class="form-control input-sm chat_input"
                        placeholder="Write your message here...">
+                <button class="btn btn-primary" @onclick="Send">Send</button>
             </div>
         </div>
     </div>
-
 </div>
 
 @code {
     [Parameter]
-    public int ToUserId { get; set; } = 1;
-    private List<Contact> ContactList { get; set; } = new List<Contact>();
-    public Contact ToUser { get; set; } = new Contact();
+    public string ToUserId { get; set; }
+    public User ToUser { get; set; } = new User();
+    public string FromUserId { get; set; }
+    public string MessageText { get; set; }
+    public List<Message> Messages { get; set; } = new List<Message>();
+    private HubConnection hubConnection;
 
-    protected override void OnInitialized()
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        ContactList.AddRange(new[]
-        {
-                new Contact(1, "Julius", "Caesar"),
-                new Contact(2, "Marco", "Antonio"),
-                new Contact(3, "Leonel", "Messi"),
-                new Contact(4, "Cristiano", "Ronaldo"),
-                new Contact(5, "Antonie", "Griezzman")
-            });
+        var claimsPrincipal = (await authenticationStateTask).User;
 
-        ToUser = ContactList.Where(con => con.ContactId == ToUserId).FirstOrDefault();
+        if (!claimsPrincipal.Identity.IsAuthenticated)
+            NavigationManager.NavigateTo("/");
+
+        FromUserId = (await _httpClient.GetFromJsonAsync<User>("user/getcurrentuser")).UserId.ToString();
+
+        if (Convert.ToInt32(ToUserId) > 0)
+            ToUser = await _httpClient.GetFromJsonAsync<User>("user/getprofile/" + ToUserId);
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+            .Build();
+
+        hubConnection.On<Message>("ReceiveMessage", (message) =>
+        {
+            Messages.Add(message);
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    private async Task Send()
+    {
+        Message message = new();
+        message.FromUserId = FromUserId;
+        message.ToUserId = ToUserId;
+        message.MessageText = MessageText;
+
+        await hubConnection.SendAsync("SendMessage", message);
     }
 }
