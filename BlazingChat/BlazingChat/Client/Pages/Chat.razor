@@ -5,12 +5,13 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
 @inject HttpClient _httpClient
+@inject IJSRuntime jsRuntime
 
-<div style="border:0px;height:90vh;">
-    <div class="panel panel-primary" style="height: 100%;">
-        <div class="panel-heading top-bar">
+<div style="border:0px;height:90vh;" class="card">
+    <div class="card-header" style="height: 100%;">
+        <div class="card-header-tabs top-bar">
             <div class="col-md-8 col-xs-8">
-                <h3 class="panel-title">
+                <h3 class="card-title">
                     @if (ToUser != null)
                     {
                         @if (ToUser.FirstName != null || ToUser.LastName != null)
@@ -25,7 +26,8 @@
                 </h3>
             </div>
         </div>
-        <div id="divMessageContainerBase" class="panel-body msg_container_base">
+        <br />  
+        <div id="divMessageContainerBase" class="card-body msg_container_base">
             @if (Messages != null && Messages.Count() > 0)
             {
                 @foreach (var message in Messages)
@@ -54,7 +56,7 @@
             }
         </div>
         <!--CHAT USER BOX-->
-        <div class="panel-footer">
+        <div class="card-footer">
             <div class="input-group" id="myForm">
                 <input id="txtMessageInput" @bind="MessageText" type="text" class="form-control input-sm chat_input"
                        placeholder="Write your message here...">
@@ -94,8 +96,12 @@
 
         hubConnection.On<Message>("ReceiveMessage", (message) =>
         {
-            Messages.Add(message);
-            StateHasChanged();
+            if (message.FromUserId == FromUserId ||
+            (message.ToUserId == FromUserId && message.FromUserId == ToUserId))
+            {
+                Messages.Add(message);
+                StateHasChanged();
+            }
         });
 
         await hubConnection.StartAsync();
@@ -109,5 +115,12 @@
         message.MessageText = MessageText;
 
         await hubConnection.SendAsync("SendMessage", message);
+
+        MessageText = "";
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var module = await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/site.js");
+        await module.InvokeVoidAsync("setScroll");
     }
 }
